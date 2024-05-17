@@ -1,33 +1,33 @@
+# Import necessary libraries
 import streamlit as st
 import pandas as pd
-import os
 
-st.set_page_config(page_title="Excel to CSV Converter", page_icon=":excel:", layout="wide")
+# Function to convert file to CSV format
+def convert_to_csv(file):
+    df = pd.read_excel(file)
+    return df.to_csv(index=False)
 
-st.title("Excel to CSV Converter")
-st.subheader("Upload your Excel file and convert it to CSV format")
+# Function to convert file to Excel format
+def convert_to_excel(file):
+    df = pd.read_csv(file)
+    return df.to_excel("converted_file.xlsx", index=False)
 
-uploaded_file = st.file_uploader("Upload Excel file", type="xlsx")
+# Main function
+def main():
+    # File upload
+    uploaded_file = st.file_uploader("Upload a file")
 
-if uploaded_file is not None:
-    try:
-        df = pd.read_excel(uploaded_file, engine="openpyxl")
-        csv_file = pd.ExcelFile(uploaded_file).parse(0).to_csv(index=False)
+    # Convert to CSV
+    if st.button("Convert to CSV"):
+        if uploaded_file is not None:
+            csv_file = convert_to_csv(uploaded_file)
+            st.download_button("Download CSV", csv_file, "converted_file.csv")
 
-        st.subheader("File Details")
-        st.write("File Type: Excel (.xlsx)")
-        st.write("File Size: {:.2f} MB".format(uploaded_file.size / (1024 * 1024)))
-        st.write("Number of Rows: ", len(df.index))
+    # Convert to Excel
+    if st.button("Convert to Excel"):
+        if uploaded_file is not None:
+            excel_file = convert_to_excel(uploaded_file)
+            st.download_button("Download Excel", excel_file, "converted_file.xlsx")
 
-        st.subheader("Download CSV File")
-        st.download_button(
-            label="Download CSV",
-            data=csv_file,
-            file_name="output.csv",
-            mime="text/csv"
-        )
-
-        st.write("CSV file has been downloaded successfully.")
-
-    except Exception as e:
-        st.error("Error occurred while reading the Excel file:", e)
+if __name__ == "__main__":
+    main()
